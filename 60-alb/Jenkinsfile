@@ -1,26 +1,65 @@
 
-variable "project_name" {
-    default = "expense"
-}
+pipeline {
+    agent {
+        label 'AGENT-1'
+    }
+    options{
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        ansiColor('xterm')
+    }
+    // environment {
+    //     DEBUG = 'true'
+    // }
 
-variable "environment" {
-    default = "dev"
-}
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select Action')
+    }
+    stages {
+        stage('Init and Plan') {
+            steps {
+                withAWS(region: 'us-east-1', credentials: 'AWS-creds') {
+                    sh """
+                        cd 60-alb
+                        terraform init -reconfigure
+                        terraform plan -out=tfplan
+                    """
+                }
+            }
+        }
 
-variable "common_tags" {
-    default = {
-        Project = "expense"
-        Terraform = "true"
-        Environment = "dev"
+        stage('Apply or Destroy') {
+            /* input {
+                message "Should we continue to ${params.ACTION}"
+                ok "Yes, we should."
+            } */
+            steps {
+                withAWS(region: 'us-east-1', credentials: 'AWS-creds') {
+                    sh """
+                        cd 60-alb
+                        if [ ${params.ACTION} == 'apply' ]
+                        then
+                            terraform apply -auto-approve tfplan
+                        elif [ ${params.ACTION} == 'destroy' ]
+                        then
+                            terraform destroy -auto-approve
+                        fi
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always{
+            echo "This sections runs always"
+            deleteDir()
+        }
+        success{
+            echo "This section run when pipeline success"
+        }
+        failure{
+            echo "This section run when pipeline failure"
+        }
     }
 }
-
-
-variable "zone_name" {
-    default = "daws81s.online"
-}
-
-variable "zone_id" {
-    default = "Z09912121MS725XSKH1TG"
-}
-
