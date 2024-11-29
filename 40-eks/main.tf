@@ -1,10 +1,10 @@
 
 resource "aws_key_pair" "eks" {
-  key_name   = "lakshmi"
+  key_name   = "linux"
   # you can paste the public key directly like this
   #public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL6ONJth+DzeXbU3oGATxjVmoRjPepdl7sBuPzzQT2Nc sivak@BOOK-I6CR3LQ85Q"
-  //public_key = file("~/.ssh/eks.pub")
-  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILqK106KhHr2t7rKt/L7/JYvMKCjSpL45JTDQJ2JLBLR 91911@LakshmiMungara"
+  # public_key = file("~/.ssh/lakshmi.pub")
+   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICMGrie7EZk075eyv86e48w55sOBL9FCjkuoGLTWzQn2 91911@LakshmiMungara"
   # ~ means windows home directory
 }
 
